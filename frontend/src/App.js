@@ -8,7 +8,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Default route - redirects to signin */}
-        <Route path="/" element={<Navigate to="/signin" />} />
+        <Route path="/" element={<Navigate to="/signup" />} />
 
         {/* Sign in page route */}
         <Route path="/signin" element={<Signin />} /> {/* Use imported name */}
