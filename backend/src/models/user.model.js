@@ -2,16 +2,25 @@ const { Sequelize } = require("sequelize");
 const { sequelize } = require(".");
 
 module.exports = (sequelize, Sequelize) => {
-    const User = sequelize.define("user", {
+    const User = sequelize.define("User", {
         email: {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: false,
         validate: { isEmail: true }
         },
         firebase_uid: {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: false
         }
         
-    })
+    });
+    User.associate = (models) => {
+        User.hasMany(models.File, {
+            foreignKey: 'userId',
+            as: 'files'
+            });
+    };
+
+    return User;
 }
+
