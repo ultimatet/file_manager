@@ -41,8 +41,8 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 /* Create database tables and models */
-db.users = require("./user.model.js")(sequelize, Sequelize);
-db.files = require("./file.model.js")(sequelize, Sequelize);
+db.users = require("./user.js")(sequelize, Sequelize);
+db.files = require("./file.js")(sequelize, Sequelize);
 
 
 module.exports = db;

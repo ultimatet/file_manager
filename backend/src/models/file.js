@@ -20,7 +20,7 @@ module.exports = (sequelize, Sequelize) => {
     });
     File.associate = (models) => {
         File.belongsTo(models.User, {
-            foreignKey: 'userId',
+            foreignKey: 'user_id',
             as: 'user'
             });
     };

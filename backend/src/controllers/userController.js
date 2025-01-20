@@ -1,4 +1,4 @@
-const { User, File } = require('../models');
+const { User } = require('../models');
 
 const userController = {
     async createUser(req,res) {
@@ -22,11 +22,11 @@ const userController = {
     
     async getUser(req,res) {
         try {
-            const {firebase_uid} = req.params;
-            if (!firebase_uid) {
-                return res.status(400).json({ error: 'firebase_uid is required' });
+            const {user_id} = req.params;
+            if (!user_id) {
+                return res.status(400).json({ error: 'user_id is required' });
             }
-            const user = await User.findOne ({firebase_uid})
+            const user = await User.findOne ({user_id})
             if (!user) {
                 return res.status(404).json({ error: 'User not found' });
             }
@@ -39,11 +39,11 @@ const userController = {
 
     async deleteUser(req,res) {
         try {
-            const {firebase_uid} = req.params;
-            if (!firebase_uid) {
-                return res.status(400).json({ error: 'firebase_uid is required' });
+            const {email} = req.params;
+            if (!email) {
+                return res.status(400).json({ error: 'email is required' });
             }
-            const user = await User.destroy({ where: {firebase_uid: firebase_uid}});
+            const user = await User.destroy({ where: {email: email}});
             if (!user) {
                 return res.status(404).json({ error: 'User not found' });
             }
