@@ -3,11 +3,6 @@ import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {auth} from './firebase.js'
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-
-
 
 function SignUp() {
   const [email, setEmail] = useState('');

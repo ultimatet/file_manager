@@ -1,0 +1,84 @@
+/* Container for the entire navigation system */
+.nav-container {
+    position: relative;
+}
+
+/* Toggle button styling */
+.nav-toggle {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    /* Ensure button stays above overlay */
+    padding: 10px 15px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+
+/* Background overlay */
+.Navbar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out;
+    z-index: 999;
+}
+
+.Navbar-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Navigation panel */
+.Navbar {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    /* Start off-screen */
+    width: 250px;
+    /* Fixed width instead of percentage */
+    height: 100vh;
+    background-color: #333;
+    transition: left 0.3s ease-in-out;
+    z-index: 1000;
+}
+
+.Navbar.open {
+    left: 0;
+}
+
+/* Navigation list styling */
+.Navbar ul {
+    padding: 60px 0 20px;
+    /* Added top padding to account for button */
+    list-style-type: none;
+}
+
+.Navbar li {
+    margin: 0;
+    padding: 0;
+}
+
+/* Link styling */
+.Navbar a {
+    display: block;
+    padding: 15px 25px;
+    color: white;
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: background-color 0.2s ease;
+}
+
+.Navbar a:hover {
+    background-color: #444;
+}
+
