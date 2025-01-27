@@ -1,10 +1,10 @@
 import Navbar from './Navbar.js';
 
-const User = () => {
+
+const User = ({onLogout}) => {
     return (
         <div className="User">
-            <Navbar/>
-            
+            <Navbar onLogout={onLogout}/>
         </div>
     );
 };

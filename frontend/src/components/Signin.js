@@ -1,19 +1,24 @@
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { useState } from 'react';
-import {auth} from './firebase.js'
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { auth } from './firebase.js'
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
-function Signin() {
+
+function Signin({onLogin, isLoggedIn}) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
+    const navigate = useNavigate(); 
+    const location = useLocation();
+    useEffect(() => {
+        if (isLoggedIn && location.pathname !== '/user') {
+            navigate('/user');
+        } else if (!isLoggedIn && location.pathname !== '/signin') {
+            navigate('/signin')}
+    }, [isLoggedIn, navigate]);
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-            console.log('User signed in:', user);
+           await onLogin(email, password);
         } catch (error) {
             console.error('Sign in error:', error.code, error.message);
             alert(error.message);
