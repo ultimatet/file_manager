@@ -1,17 +1,39 @@
-import './fileView.css';
-import { storage } from './firebase';
-import { ref, getDownloadURL } from 'firebase/storage';
-import { useState, useEffect } from 'react';
- 
-function FileView({file}) {
-    const fileUpload = {
-        const { fileUpload, setFileUpload } = useState(null);
-            
-    };
+import React, { useEffect, useState } from 'react';
+import { getStorage, ref, listAll, getDownloadURL } from 'firebase/storage';
+
+const FileView = () => {
+    const [files, setFiles] = useState([]);
+    const storage = getStorage();
+
+    useEffect(() => {
+        const fetchFiles = async () => {
+            const storageRef = ref(storage, '/uploads'); 
+            const result = await listAll(storageRef);
+            const filePromises = result.items.map(async (itemRef) => {
+                const url = await getDownloadURL(itemRef);
+                return { name: itemRef.name, url };
+            });
+            const files = await Promise.all(filePromises);
+            setFiles(files);
+        };
+
+        fetchFiles();
+    }, [storage]);
+
     return (
-        <div className="file-view">
-            <h3>{file.name}</h3>
-            <p>{file.content}</p>
+        <div>
+            <h1>Uploaded Files</h1>
+            <ul>
+                {files.map((file, index) => (
+                    <li key={index}>
+                        <a href={file.url} target="_blank" rel="noopener noreferrer">
+                            {file.name}
+                        </a>
+                    </li>
+                ))}
+            </ul>
         </div>
     );
-}
+};
+
+export default FileView;

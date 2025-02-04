@@ -56,7 +56,7 @@ const fileController = {
                 return res.status(400).json({ error: 'file_id is required' });
             }
             const updateData = req.body;
-            const [rowsAffected, [updatedFile]] = await File.update(
+            const [rowsAffected, [updatedFile]] = await File.put(
                 updateData,
                 {
                     where: { file_id },

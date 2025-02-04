@@ -7,6 +7,7 @@ import Signin from './components/Signin.js';
 import User from './components/User.js';
 import { auth } from './components/firebase.js'
 import { signOut } from 'firebase/auth';
+import FileUpload from './components/fileUpload.js';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -52,7 +53,9 @@ function App() {
 
         <Route path="/signup" element={<Signup />} /> 
 
-        <Route path="/user" element={isLoggedIn ? (<User onLogout={handleLogout}/>) : (<Navigate replace to ='/signin'/>)} /> 
+        <Route path="/user" element={isLoggedIn ? (<User onLogout={handleLogout}/>) : (<Navigate replace to ='/signin'/>)} />
+
+        <Route path="/fileupload" element={<fileUpload />} />  
       </Routes>
     </BrowserRouter>
   );
