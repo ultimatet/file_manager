@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { getStorage, ref, listAll, getDownloadURL } from 'firebase/storage';
+import { ref, listAll, getDownloadURL } from 'firebase/storage';
+import { storage } from './firebase';
 
 const FileView = () => {
     const [files, setFiles] = useState([]);
-    const storage = getStorage();
 
     useEffect(() => {
         const fetchFiles = async () => {
