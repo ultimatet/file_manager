@@ -4,7 +4,7 @@ const cors = require('cors');
 const fileRoutes = require('./src/routes/fileRoutes');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
 // Middleware
 app.use(cors()); // Enables CORS for all routes
