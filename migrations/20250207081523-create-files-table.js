@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('Files', {
+    await queryInterface.createTable('files', {
       file_id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -25,7 +25,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Users',  // This must match the actual table name in the database
+          model: 'users',  // This must match the actual table name in the database
           key: 'user_id',
         },
         onUpdate: 'CASCADE',

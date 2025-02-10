@@ -23,8 +23,7 @@ function FileUpload() {
     }
   };
 
-  // Handle the file upload process
-  const handleUpload = async () => {
+const handleUpload = async () => {
   if (!selectedFile) {
     setError('Please select a file first');
     return;
@@ -62,17 +61,34 @@ function FileUpload() {
           const downloadUrl = await getDownloadURL(storageRef);
 
           // Store the uploaded file information
-          setUploadedFile({
+          const fileData = {
             name: selectedFile.name,
             path: filePath,
             type: selectedFile.type,
             size: selectedFile.size,
+            url: downloadUrl
+          };
+
+          // Make API call to save file metadata
+          const response = await fetch('/api/files', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(fileData)
           });
 
+          if (!response.ok) {
+            throw new Error('Failed to save file metadata');
+          }
+
+          // Update state with file information
+          setUploadedFile(fileData);
           setFileUrl(downloadUrl);
           setIsUploading(false);
           setUploadProgress(0);
           setSelectedFile(null); // Reset file input
+          
         } catch (err) {
           console.error('Error getting download URL or saving metadata:', err);
           setError('Failed to process uploaded file');
