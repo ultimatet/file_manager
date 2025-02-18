@@ -16,58 +16,15 @@ const FileView = () => {
         const files = await Promise.all(filePromises);
         setFiles(files);
     };
+useEffect(() => {
+    fetchFiles();
+}, []);
 
-    useEffect(() => {
-        fetchFiles(); // Initial fetch
-
-        // Set up WebSocket connection
-        const socket = new WebSocket('ws://localhost:3000');
-
-        socket.onopen = () => {
-            console.log('WebSocket Connected');
-        };
-
-        socket.onmessage = async (event) => {
-            await fetchFiles();
-            console.log('WebSocket message event:', event);
-            const data = JSON.parse(event.data);
-            console.log('WebSocket message received:', data);
-
-            if (data.action === 'insert') {
-                console.log('Adding new file:', data.file);
-                setFiles((prevFiles) => [...prevFiles, data.file]); // Add new file
-            } else if (data.action === 'update') {
-                console.log('Updating file:', data.file);
-                setFiles((prevFiles) =>
-                    prevFiles.map((file) =>
-                        file.name === data.file.name ? { ...file, url: data.file.url } : file
-                    )
-                ); // Update file
-            } else if (data.action === 'delete') {
-                console.log('Deleting file:', data.file);
-                setFiles((prevFiles) =>
-                    prevFiles.filter((file) => file.name !== data.file.name)
-                ); // Remove deleted file
-            }
-        };
-
-        socket.onerror = (error) => {
-            console.error('WebSocket Error:', error);
-        };
-
-        socket.onclose = () => {
-            console.log('WebSocket Disconnected');
-        };
-
-        return () => {
-            console.log('Cleaning up WebSocket connection');
-            socket.close(); // Cleanup on unmount
-        };
-    }, []);
 
     return (
         <div>
             <h1>Uploaded Files</h1>
+            <button onClick={fetchFiles}>Refresh Files</button>
             <ul>
                 {files.map((file, index) => (
                     <li key={index}>

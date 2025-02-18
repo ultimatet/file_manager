@@ -1,25 +1,32 @@
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
-const WebSocket = require('ws');
 const { Client } = require('pg');
 const fileRoutes = require('./src/routes/fileRoutes');
 
 const app = express();
-const PORT = 3000;
+const PORT = 3001;
 
 // Express Middleware
 app.use(cors());
 app.use(express.json());
 
+// Add this before app.use('/api', fileRoutes);
+app.use((req, res, next) => {
+    console.log('Request received:', {
+        method: req.method,
+        url: req.url,
+        path: req.path,
+        body: req.body
+    });
+    next();
+});
 // Mount routes
 app.use('/api', fileRoutes);
+console.log('Routes mounted at /api');
 
 // Create HTTP server
 const server = http.createServer(app);
-
-// Create WebSocket server attached to HTTP server
-const wss = new WebSocket.Server({ server });
 
 // Connect to PostgreSQL
 const pgClient = new Client({
@@ -30,29 +37,33 @@ const pgClient = new Client({
     port: 5432,
 });
 
-pgClient.connect();
+pgClient.connect()
+    .then(() => console.log("✅ Successfully connected to PostgreSQL"))
+    .catch(err => console.error("❌ PostgreSQL connection error:", err));
 
-// Listen for file changes
-pgClient.query('LISTEN file_updates');
-
-pgClient.on('notification', (msg) => {
-    const change = JSON.parse(msg.payload);
-    console.log('File table changed:', change);
-
-    // Send data to all connected WebSocket clients
-    wss.clients.forEach(client => {
-        if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify(change));
-        }
-    });
+// Listen for file changes using PostgreSQL NOTIFY
+pgClient.query('LISTEN file_updates', (err, res) => {
+    if (err) {
+        console.error("❌ Error listening to file_updates:", err);
+    } else {
+        console.log("🔔 Listening for file_updates...");
+    }
 });
 
-wss.on('connection', (ws) => {
-    console.log('Client connected');
-    ws.send(JSON.stringify({ message: "Connected to WebSocket server" }));
+// Event listener for file changes
+pgClient.on('notification', async (msg) => {
+    console.log('🔄 File table updated:', msg.payload);
+});
 
-    ws.on('close', () => console.log('Client disconnected'));
-    ws.on('error', (err) => console.error('WebSocket Error:', err));
+// API Route for fetching files after insert/update
+app.get('/api/file', async (req, res) => {
+    try {
+        const result = await pgClient.query('SELECT * FROM files ORDER BY created_at DESC');
+        res.json(result.rows);
+    } catch (err) {
+        console.error('❌ Error fetching files:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 
 // Error handling middleware
@@ -63,19 +74,23 @@ app.use((err, req, res, next) => {
 
 // Start the server
 server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`WebSocket server running on ws://localhost:${PORT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
 });
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
     console.log('SIGTERM signal received: closing server');
     server.close(() => {
-        console.log('HTTP/WebSocket server closed');
+        console.log('HTTP server closed');
     });
     pgClient.end(() => {
         console.log('PostgreSQL connection closed');
     });
+});
+
+// Add this in server.js after your other routes
+app.get('/test', (req, res) => {
+    res.json({ message: 'Test route working' });
 });
 
 module.exports = app;

@@ -1,5 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
-    const File = sequelize.define("File", {
+    const File = sequelize.define("File",{
         file_id: {
             type: Sequelize.INTEGER,
             autoIncrement: true,
@@ -16,13 +16,28 @@ module.exports = (sequelize, Sequelize) => {
         },
         mime_type: {
             type: Sequelize.STRING,
+        },
+        user_id: {  // ✅ Ensure user_id is optional
+            type: Sequelize.INTEGER,
+            allowNull: true,
+            references: {
+                model: "users",
+                key: "id",
+            },
+        },
+        },
+        {
+            tableName: "files", // ✅ Explicitly set lowercase table name
+            timestamps: true,  // ✅ Disable timestamps if not needed
         }
-    });
+    );
+
     File.associate = (models) => {
         File.belongsTo(models.User, {
             foreignKey: 'user_id',
             as: 'user'
-            });
+        });
     };
+
     return File;
-}
+};

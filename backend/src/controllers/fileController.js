@@ -4,7 +4,9 @@ const fileController = {
     async createFile(req, res) {
         try {
             const { file_name, firebase_url, mime_type } = req.body;
-            
+            console.log("POST /api/file hit!"); // ✅ Logs the API call
+            console.log("Request Body:", req.body); // ✅ Logs the request body
+
             if (!file_name || !firebase_url) {
                 return res.status(400).json({ 
                     error: "File name and firebase URL are required" 
@@ -30,7 +32,8 @@ const fileController = {
     async getFile(req, res) {
         try {
             const { file_id } = req.params;
-            
+            console.log("POST /api/user hit!"); // ✅ Logs the API call
+            console.log("Request Body:", req.body); // ✅ Logs the request body
             if (!file_id) {
                 return res.status(400).json({ 
                     error: 'File ID is required' 
@@ -60,6 +63,7 @@ const fileController = {
     async getAllFile(req, res) {  // renamed from getAllFile
         try {
             const files = await File.findAll();
+            
 
             if (files.length === 0) {
                 return res.status(204).json([]); // No Content
