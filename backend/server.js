@@ -11,7 +11,7 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
-// Add this before app.use('/api', fileRoutes);
+// Logging middleware
 app.use((req, res, next) => {
     console.log('Request received:', {
         method: req.method,
