@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { ref, listAll, getDownloadURL } from 'firebase/storage';
+import { ref, listAll, getDownloadURL, deleteObject } from 'firebase/storage';
 import { storage } from './firebase';
 import FileUpload from './fileUpload'; 
 import './fileView.css';
@@ -20,6 +20,20 @@ const FileView = () => {
         setFiles(files);
     }, []); // Empty dependency array means it won't change on re-renders
 
+    const deleteFile = async (file) => {
+        try {
+            const storageRef = ref(storage, `uploads/${file.name}`);
+            await deleteObject(storageRef);
+            const response = await fetch(`http://localhost:3001/api/file/${file.file_id}`, {
+                        method: 'DELETE',
+                    });
+            if (!response.ok) throw new Error('Failed to delete file metadata');
+            fetchFiles();
+        } catch(err) {
+            console.error('Failed to delete file:', err);
+        }
+    };
+
     useEffect(() => {
         fetchFiles(); 
     }, [fetchFiles]); // Fetch files on initial render
@@ -34,14 +48,12 @@ const FileView = () => {
     const renderFilePreview = (file) => {
         const { url, name } = file;
         const ext = name.split('.').pop().toLowerCase();
-        console.log("Rendering file preview for:", file);
 
         // Image files
         if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
             return (
                 <div className="file-preview">
                     <img src={url} alt={name} className="preview-image" />
-                    <p>{name}</p>
                 </div>
             );
         } 
@@ -49,8 +61,7 @@ const FileView = () => {
         else if (ext === 'pdf') {
             return (
                 <div className="file-preview">
-                    <iframe src={url} title={name} className="preview-pdf" />
-                    <p>{name}</p>
+                    <iframe src={url} title={name} className="preview-pdf"  />
                 </div>
             );
         }
@@ -62,7 +73,6 @@ const FileView = () => {
                         <source src={url} />
                         Your browser does not support video playback.
                     </video>
-                    <p>{name}</p>
                 </div>
             );
         }
@@ -74,7 +84,6 @@ const FileView = () => {
                         <source src={url} />
                         Your browser does not support audio playback.
                     </audio>
-                    <p>{name}</p>
                 </div>
             );
         }
@@ -106,6 +115,8 @@ const FileView = () => {
                     {files.map((file, index) => (
                         <div className="file-card" key={index}>
                             {renderFilePreview(file)}
+                            <a href={file.url} target="_blank" rel="noopener noreferrer"> {file.name} </a>
+                            <button onClick={() => deleteFile(file)}>Delete</button>
                         </div>
                     ))}
                 </div>
