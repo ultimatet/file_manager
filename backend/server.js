@@ -3,6 +3,7 @@ const cors = require('cors');
 const http = require('http');
 const { Client } = require('pg');
 const fileRoutes = require('./src/routes/fileRoutes');
+require('dotenv').config();
 
 const app = express();
 const PORT = 3001;
@@ -30,11 +31,11 @@ const server = http.createServer(app);
 
 // Connect to PostgreSQL
 const pgClient = new Client({
-    user: 'postgres',
-    host: '127.0.0.1',
-    database: 'database_development',
-    password: 'ultimatetc123',
-    port: 5432,
+    user: process.env.PG_USER,
+    host: process.env.PG_HOST,
+    database: process.env.PG_DATABASE,
+    password: process.env.PG_PASSWORD,
+    port: process.env.PG_PORT,
 });
 
 pgClient.connect()
