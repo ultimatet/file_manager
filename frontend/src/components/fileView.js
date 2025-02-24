@@ -40,8 +40,7 @@ const FileView = () => {
     } catch (error) {
         console.error("Error fetching files:", error);
     }
-}, []);
- // Empty dependency array means it won't change on re-renders
+}, []); // Empty dependency array means it won't change on re-renders
 
     const deleteFile = async (file) => {
         try {
@@ -143,8 +142,8 @@ const FileView = () => {
                     {files.map((file, index) => (
                         <div className="file-card" key={index}>
                             {renderFilePreview(file)}
-                            <a href={file.url} target="_blank" rel="noopener noreferrer"> {file.name} </a>
-                            <button onClick={() => deleteFile(file)}>Delete</button>
+                            <a href={file.url} target="_blank" rel="noopener noreferrer"> {file.name} </a> <br></br>
+                            <button className="del-button"onClick={() => deleteFile(file)}>Delete</button>
                         </div>
                     ))}
                 </div>

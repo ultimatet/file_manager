@@ -4,6 +4,7 @@
     margin: 0 auto;
 }
 
+.del-button,
 .refresh-button {
     background-color: #4285f4;
     color: white;
@@ -13,8 +14,9 @@
     cursor: pointer;
     margin-bottom: 20px;
 }
+
+.del-button:hover,
 .refresh-button:hover {
-    transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     background-color: #23457c;
 }
