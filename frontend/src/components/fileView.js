@@ -9,25 +9,56 @@ const FileView = () => {
 
     // Function to fetch all files initially
      const fetchFiles = useCallback(async () => {
+    try {
         const storageRef = ref(storage, '/uploads');
         const result = await listAll(storageRef);
+
+        // Fetch metadata from your backend
+        const response = await fetch('http://localhost:3001/api/file'); 
+        const fileMetadata = await response.json(); 
+
         const filePromises = result.items.map(async (itemRef) => {
             const url = await getDownloadURL(itemRef);
             const extension = getFileExtension(itemRef.name);
-            return { name: itemRef.name, url, extension };
+
+            // Match Firebase file with DB metadata
+            const metadata = fileMetadata.find(meta => meta.file_name === itemRef.name);
+            if (!metadata) {
+                console.warn(`No metadata found for ${itemRef.name}`);
+}
+
+            return {
+                name: itemRef.name,
+                url,
+                extension,
+                file_id: metadata ? metadata.file_id : null, // Get file_id from DB
+            };
         });
+
         const files = await Promise.all(filePromises);
         setFiles(files);
-    }, []); // Empty dependency array means it won't change on re-renders
+    } catch (error) {
+        console.error("Error fetching files:", error);
+    }
+}, []);
+ // Empty dependency array means it won't change on re-renders
 
     const deleteFile = async (file) => {
         try {
+            if (!file.file_id) {
+                console.error("Cannot delete file: Missing file_id", file);
+                return;
+            }
             const storageRef = ref(storage, `uploads/${file.name}`);
             await deleteObject(storageRef);
             const response = await fetch(`http://localhost:3001/api/file/${file.file_id}`, {
                         method: 'DELETE',
                     });
             if (!response.ok) throw new Error('Failed to delete file metadata');
+            if (response.ok) {
+                console.log('File deleted successfully:', file);
+                setFiles(files.filter(f => f !== file));
+            }
             fetchFiles();
         } catch(err) {
             console.error('Failed to delete file:', err);
@@ -94,9 +125,6 @@ const FileView = () => {
                     <div className="generic-file-icon">
                         <i className="file-icon">📄</i>
                     </div>
-                    <a href={url} target="_blank" rel="noopener noreferrer">
-                        {name}
-                    </a>
                 </div>
             );
         }

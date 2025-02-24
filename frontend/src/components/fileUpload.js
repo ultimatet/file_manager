@@ -33,7 +33,7 @@ function FileUpload({refreshFiles}) {
         const nameWithoutExtension = originalName.substring(0, originalName.lastIndexOf(".")) || originalName;
         const extension = originalName.split('.').pop();
 
-        let filePath = `uploads/${originalName}`;
+        let fileName = originalName;
         let counter = 1;
 
         // Check if file already exists in Firebase Storage
@@ -42,10 +42,13 @@ function FileUpload({refreshFiles}) {
         const existingFiles = result.items.map(item => item.name);
 
         // If file already exists, find the next available numbered filename
-        while (existingFiles.includes(filePath)) {
-            filePath = `uploads/${nameWithoutExtension}(${counter}).${extension}`;
+        while (existingFiles.includes(fileName)) {
+            fileName = `${nameWithoutExtension}(${counter}).${extension}`;
             counter++;
         }
+
+        // Full path for Firebase upload
+        const filePath = `uploads/${fileName}`;
 
         // Upload file with unique name
         const fileRef = ref(storage, filePath);
@@ -66,11 +69,14 @@ function FileUpload({refreshFiles}) {
                 try {
                     const downloadUrl = await getDownloadURL(fileRef);
 
+                    // Important: Save just the filename, not the full path
                     const fileData = {
-                        file_name: filePath, // Save the new unique file name
+                        file_name: fileName, // Save just the filename
                         firebase_url: downloadUrl,
                         mime_type: selectedFile.type,
                     };
+
+                    console.log('Saving metadata for file:', fileName);
 
                     const response = await fetch('http://localhost:3001/api/file', {
                         method: 'POST',
@@ -80,10 +86,17 @@ function FileUpload({refreshFiles}) {
 
                     if (!response.ok) throw new Error('Failed to save file metadata');
 
+                    const responseData = await response.json();
+                    console.log('File metadata saved:', responseData);
+
                     setIsUploading(false);
                     setUploadProgress(0);
                     setSelectedFile(null);
-                    refreshFiles(); // Refresh file list after upload
+                    
+                    // Give a small delay to ensure database is updated
+                    setTimeout(() => {
+                        refreshFiles(); // Refresh file list after upload
+                    }, 500);
                 } catch (err) {
                     console.error('Error processing uploaded file:', err);
                     setError('Failed to process uploaded file');
