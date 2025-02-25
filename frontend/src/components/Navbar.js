@@ -21,9 +21,6 @@ function Navbar({onLogout}) {
                         <Link to="/User">Home</Link> 
                     </li>
                     <li>
-                        <Link to="/About">About</Link>
-                    </li>
-                    <li>
                         <Link to='/Signin' onClick={(e) => {
                             e.preventDefault(); 
                             onLogout();}}>Logout</Link>

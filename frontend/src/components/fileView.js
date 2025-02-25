@@ -42,25 +42,32 @@ const FileView = () => {
     }
 }, []); // Empty dependency array means it won't change on re-renders
 
+
     const deleteFile = async (file) => {
         try {
             if (!file.file_id) {
                 console.error("Cannot delete file: Missing file_id", file);
+                alert("Cannot delete file: Missing file ID. The file might exist in storage but not in the database.");
                 return;
             }
+            
+            if (!window.confirm(`Are you sure you want to delete "${file.name}"?`)) {
+                return;
+            }
+            
             const storageRef = ref(storage, `uploads/${file.name}`);
             await deleteObject(storageRef);
             const response = await fetch(`http://localhost:3001/api/file/${file.file_id}`, {
-                        method: 'DELETE',
-                    });
+                method: 'DELETE',
+            });
+            
             if (!response.ok) throw new Error('Failed to delete file metadata');
-            if (response.ok) {
-                console.log('File deleted successfully:', file);
-                setFiles(files.filter(f => f !== file));
-            }
-            fetchFiles();
+            
+            console.log('File deleted successfully:', file);
+            setFiles(files.filter(f => f.file_id !== file.file_id));
         } catch(err) {
             console.error('Failed to delete file:', err);
+            alert(`Failed to delete file: ${err.message}`);
         }
     };
 

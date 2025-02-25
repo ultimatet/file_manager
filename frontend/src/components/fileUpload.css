@@ -12,8 +12,20 @@
 }
 
 .file-input {
-    margin-bottom: 15px;
+    display: block;
     width: 100%;
+    max-width: 250px;
+    padding: 5px;
+    font-size: 14px;
+    border-radius: 5px;
+    background-color: #ffffff;
+    cursor: pointer;
+    text-align: center;
+}
+
+.file-input:hover {
+    background-color: #f8f9fa;
+    border-color: #0056b3;
 }
 
 .upload-button {
